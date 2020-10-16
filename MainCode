@@ -1,0 +1,168 @@
+import pandas as pd
+import numpy as np
+import os
+import datetime
+from datetime import datetime, timedelta
+og_2G=pd.DataFrame()
+og_3G=pd.DataFrame()
+og_4G_FDD=pd.DataFrame()
+og_4G_TDD=pd.DataFrame()
+cp=pd.DataFrame()
+
+#Put only one file per folder
+fi_2G=os.listdir(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Outage_2G")
+fi_3G=os.listdir(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Outage_3G")
+fi_4G_FDD=os.listdir(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Outage_4G_FDD")
+fi_4G_TDD=os.listdir(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Outage_4G_TDD")
+fi_cp=os.listdir(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Complaints")
+                 
+k_2G="C:\\Users\\a1xvgwg0\\Desktop\\Pri\\Outage\\Outage_2G\\"
+k_3G="C:\\Users\\a1xvgwg0\\Desktop\\Pri\\Outage\\Outage_3G\\"
+k_4G_FDD="C:\\Users\\a1xvgwg0\\Desktop\\Pri\\Outage\\Outage_4G_FDD\\"
+k_4G_TDD="C:\\Users\\a1xvgwg0\\Desktop\\Pri\\Outage\\Outage_4G_TDD\\"
+k_cp="C:\\Users\\a1xvgwg0\\Desktop\\Pri\\Outage\\Complaints\\"
+
+for j in fi_2G:
+    i=k_2G+j
+    data=pd.read_excel(io=i,sheet_name="May 2019")
+    og_2G=og_2G.append(data)
+
+for j in fi_3G:
+                 i=k_3G+j
+                 data=pd.read_excel(io=i,sheet_name="May 2019")
+                 og_3G=og_3G.append(data)
+
+for j in fi_4G_FDD:
+                 i=k_4G_FDD+j
+                 data=pd.read_excel(io=i,sheet_name="May 2019")
+                 og_4G_FDD=og_4G_FDD.append(data)
+                 
+for j in fi_4G_TDD:
+                 i=k_4G_TDD+j
+                 data=pd.read_excel(io=i, sheet_name="May 2019")
+                 og_4G_TDD=og_4G_TDD.append(data)
+                 
+for j in fi_cp:
+                 i=k_cp+j
+                 data=pd.read_excel(io=i)
+                 cp=cp.append(data)
+
+               
+cp_2G=cp
+cp_3G=cp
+cp_4G_FDD=cp
+cp_4G_TDD=cp
+da=cp.iat[1,0]
+da1=str(da)
+da1=da1[0:10]
+da1
+og_2G["S.Time"]=pd.to_datetime(og_2G["S.Time"], errors='coerce')
+og_2G['S.Timehour']=og_2G['S.Time'].dt.hour
+og_2G["E.Time"]=pd.to_datetime(og_2G["E.Time"], errors='coerce')
+og_2G['E.Timehour']=og_2G['E.Time'].dt.hour
+og_2G.drop("S.Time",axis=1,inplace=True)
+og_2G.drop("E.Time",axis=1,inplace=True)
+og_2G.drop_duplicates(keep='first', inplace=True)
+og_2G=og_2G.loc[og_2G['Date'] == da1]   #Change the date respective to the complaints
+
+og_3G["S.Time"]=pd.to_datetime(og_3G["S.Time"], errors='coerce')
+og_3G['S.Timehour']=og_3G['S.Time'].dt.hour
+og_3G["E.Time"]=pd.to_datetime(og_3G["E.Time"], errors='coerce')
+og_3G['E.Timehour']=og_3G['E.Time'].dt.hour
+og_3G.drop("S.Time",axis=1,inplace=True)
+og_3G.drop("E.Time",axis=1,inplace=True)
+og_3G.drop_duplicates(keep='first', inplace=True)
+og_3G=og_3G.loc[og_3G['Date'] == da1]  #Change the date respective to the complaints
+
+og_4G_FDD["S.Time"]=pd.to_datetime(og_4G_FDD["S.Time"], errors='coerce')
+og_4G_FDD['S.Timehour']=og_4G_FDD['S.Time'].dt.hour
+og_4G_FDD["E.Time"]=pd.to_datetime(og_4G_FDD["E.Time"], errors='coerce')
+og_4G_FDD['E.Timehour']=og_4G_FDD['E.Time'].dt.hour
+og_4G_FDD.drop("S.Time",axis=1,inplace=True)
+og_4G_FDD.drop("E.Time",axis=1,inplace=True)
+og_4G_FDD.drop_duplicates(keep='first', inplace=True)
+og_4G_FDD=og_4G_FDD.loc[og_4G_FDD['Date'] == da1]  #Change the date respective to the complaints
+
+
+og_4G_TDD["S.Time"]=pd.to_datetime(og_4G_TDD["S.Time"], errors='coerce')
+og_4G_TDD['S.Timehour']=og_4G_TDD['S.Time'].dt.hour
+og_4G_TDD["E.Time"]=pd.to_datetime(og_4G_TDD["E.Time"], errors='coerce')
+og_4G_TDD['E.Timehour']=og_4G_TDD['E.Time'].dt.hour
+og_4G_TDD.drop("S.Time",axis=1,inplace=True)
+og_4G_TDD.drop("E.Time",axis=1,inplace=True)
+og_4G_TDD.drop_duplicates(keep='first', inplace=True)
+og_4G_TDD=og_4G_TDD.loc[og_4G_TDD['Date'] == da1]   #Change the date respective to the complaints
+
+
+tot_2G_=pd.merge(og_2G[['S.Timehour','E.Timehour','Sites']],cp_2G,left_on="Sites",right_on="Site_Name")
+tot_2G_1=tot_2G_[(tot_2G_.Technology.str.match("2G"))]
+tot_2G_1["mapping"] = np.where((tot_2G_1["Hour"] <= tot_2G_1["E.Timehour"]) & (tot_2G_1["Hour"] >= tot_2G_1["S.Timehour"]),"2G",np.nan)
+tot_2G_2=tot_2G_1[(tot_2G_1.mapping.str.match("2G"))]
+tot_2G_2.drop("S.Timehour",axis=1,inplace=True)
+tot_2G_2.drop("E.Timehour",axis=1,inplace=True)
+tot_2G_2.drop("Sites",axis=1,inplace=True)
+tot_2G_2.drop("mapping",axis=1,inplace=True)
+
+tot_2G_2['picount']=1
+overall_2G = pd.pivot_table(tot_2G_2,values='picount',index='Hour', aggfunc=[np.sum])
+tot_2G_2.drop("picount",axis=1,inplace=True)
+writer=pd.ExcelWriter(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Results\2G_Summary.xlsx",engine='xlsxwriter')
+overall_2G.to_excel(writer, sheet_name='Summary')
+tot_2G_2.to_excel(writer, sheet_name='Backup')
+writer.save()
+
+
+tot_3G_=pd.merge(og_3G[['S.Timehour','E.Timehour','Sites']],cp_3G,left_on="Sites",right_on="Site_Name")
+tot_3G_1=tot_3G_[(tot_3G_.Technology.str.match("3G"))]
+tot_3G_1["mapping"] = np.where((tot_3G_1["Hour"] <= tot_3G_1["E.Timehour"]) & (tot_3G_1["Hour"] >= tot_3G_1["S.Timehour"]),"3G",np.nan)
+tot_3G_2=tot_3G_1[(tot_3G_1.mapping.str.match("3G"))]
+tot_3G_2.drop("S.Timehour",axis=1,inplace=True)
+tot_3G_2.drop("E.Timehour",axis=1,inplace=True)
+tot_3G_2.drop("Sites",axis=1,inplace=True)
+tot_3G_2.drop("mapping",axis=1,inplace=True)
+
+tot_3G_2['picount']=1
+overall_3G = pd.pivot_table(tot_3G_2,values='picount',index='Hour', aggfunc=[np.sum])
+tot_3G_2.drop("picount",axis=1,inplace=True)
+writer=pd.ExcelWriter(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Results\3G_Summary.xlsx",engine='xlsxwriter')
+overall_3G.to_excel(writer, sheet_name='Summary')
+tot_3G_2.to_excel(writer, sheet_name='Backup')
+writer.save()
+
+
+
+tot_4G_FDD_=pd.merge(og_4G_FDD[['S.Timehour','E.Timehour','Sites']],cp_4G_FDD,left_on="Sites",right_on="Site_Name")
+tot_4G_FDD_1=tot_4G_FDD_[(tot_4G_FDD_.Technology.str.match("4G"))]
+tot_4G_FDD_1["mapping"] = np.where((tot_4G_FDD_1["Hour"] <= tot_4G_FDD_1["E.Timehour"]) & (tot_4G_FDD_1["Hour"] >= tot_4G_FDD_1["S.Timehour"]),"4G",np.nan)
+tot_4G_FDD_2=tot_4G_FDD_1[(tot_4G_FDD_1.mapping.str.match("4G"))]
+tot_4G_FDD_2.drop("S.Timehour",axis=1,inplace=True)
+tot_4G_FDD_2.drop("E.Timehour",axis=1,inplace=True)
+tot_4G_FDD_2.drop("Sites",axis=1,inplace=True)
+tot_4G_FDD_2.drop("mapping",axis=1,inplace=True)
+
+tot_4G_FDD_2['picount']=1
+overall_4G_FDD = pd.pivot_table(tot_4G_FDD_2,values='picount',index='Hour', aggfunc=[np.sum])
+tot_4G_FDD_2.drop("picount",axis=1,inplace=True)
+writer=pd.ExcelWriter(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Results\4G_FDD_Summary.xlsx",engine='xlsxwriter')
+overall_4G_FDD.to_excel(writer, sheet_name='Summary')
+tot_4G_FDD_2.to_excel(writer, sheet_name='Backup')
+writer.save()
+
+
+
+tot_4G_TDD_=pd.merge(og_4G_TDD[['S.Timehour','E.Timehour','Sites']],cp_4G_TDD,left_on="Sites",right_on="Site_Name")
+tot_4G_TDD_1=tot_4G_TDD_[(tot_4G_TDD_.Technology.str.match("4G"))]
+tot_4G_TDD_1["mapping"] = np.where((tot_4G_TDD_1["Hour"] <= tot_4G_TDD_1["E.Timehour"]) & (tot_4G_TDD_1["Hour"] >= tot_4G_TDD_1["S.Timehour"]),"4G",np.nan)
+tot_4G_TDD_2=tot_4G_TDD_1[(tot_4G_TDD_1.mapping.str.match("4G"))]
+tot_4G_TDD_2.drop("S.Timehour",axis=1,inplace=True)
+tot_4G_TDD_2.drop("E.Timehour",axis=1,inplace=True)
+tot_4G_TDD_2.drop("Sites",axis=1,inplace=True)
+tot_4G_TDD_2.drop("mapping",axis=1,inplace=True)
+
+tot_4G_TDD_2['picount']=1
+overall_4G_TDD = pd.pivot_table(tot_4G_TDD_2,values='picount',index='Hour', aggfunc=[np.sum])
+tot_4G_TDD_2.drop("picount",axis=1,inplace=True)
+writer =pd.ExcelWriter(r"C:\Users\a1xvgwg0\Desktop\Pri\Outage\Results\4G_TDD_Summary.xlsx",engine='xlsxwriter')
+overall_4G_TDD.to_excel(writer, sheet_name='Summary')
+tot_4G_TDD_2.to_excel(writer, sheet_name='Backup')
+writer.save()
